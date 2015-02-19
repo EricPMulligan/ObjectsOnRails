@@ -1,9 +1,9 @@
 require 'minitest/autorun'
+require 'mocha/mini_test'
 require 'date'
 
 require_relative '../spec_helper_lite'
-stub_module 'ActiveModel::Conversion'
-stub_module 'ActiveModel::Naming'
+require 'active_model'
 require_relative '../../app/models/post'
 
 describe Post do
@@ -38,19 +38,40 @@ describe Post do
     it.body.must_equal 'mybody'
   end
 
+  it 'is not valid with a blank title' do
+    [nil, '', ' '].each do |bad_title|
+      @it.title = bad_title
+      refute @it.valid?
+    end
+  end
+
+  it 'is valid with a non-blank title' do
+    @it.title = 'x'
+    assert @it.valid?
+  end
+
   describe '#publish' do
     before do
-      @blog = MiniTest::Mock.new
+      @blog = mock
       @it.blog = @blog
     end
 
-    after do
-      @blog.verify
+    it 'adds the post to the blog' do
+      @blog.stubs(:add_entry).returns([@it])
+      @it.publish
     end
 
-    it 'adds the post to the blog' do
-      @blog.expect :add_entry, nil, [@it]
-      @it.publish
+    describe 'given an invalid post' do
+      before do @it.title = nil end
+
+      it 'wont add the post to the blog' do
+        @blog.expects(:add_entry).times(0)
+        @it.publish
+      end
+
+      it 'returns false' do
+        refute(@it.publish)
+      end
     end
   end
 
@@ -63,11 +84,13 @@ describe Post do
 
     describe 'after publishing' do
       before do
-        @clock = stub!
         @now = DateTime.parse('2011-09-11T02:56')
-        stub(@clock).now { @now }
-        @it.blog = stub!
-        @it.publish
+        @clock = DateTime
+        @clock.stubs(:now).returns(@now)
+        @it.blog = mock
+        @it.blog.stubs(:add_entry)
+        @it.title = 'x'
+        @it.publish(@clock)
       end
 
       it 'is a datetime' do
