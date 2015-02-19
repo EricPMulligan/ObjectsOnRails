@@ -1,5 +1,4 @@
-require 'minitest/autorun'
-require 'mocha/mini_test'
+require 'spec_helper_lite'
 require_relative '../../app/models/blog'
 require 'ostruct'
 require 'date'
