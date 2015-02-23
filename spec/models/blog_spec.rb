@@ -9,7 +9,7 @@ describe Blog do
   end
 
   it 'has no entries' do
-    @it.entries.must_be_empty
+    expect(@it.entries).to be_empty
   end
 
   describe '#new_post' do
@@ -19,28 +19,28 @@ describe Blog do
     end
 
     it 'returns a new post' do
-      @it.new_post.must_equal @new_post
+      expect(@it.new_post).to eq(@new_post)
     end
 
     it "sets the post's blog reference to itself" do
-      @it.new_post.blog.must_equal(@it)
+      expect(@it.new_post.blog).to eq(@it)
     end
 
     it 'accepts an attribute hash on behalf of the post maker' do
-      post_source = MiniTest::Mock.new
-      post_source.expect(:call, @new_post, [{ x: 42, y: 'z' }])
+      post_source = spy
+      # post_source.expect(:call, @new_post, [{ x: 42, y: 'z' }])
       @it.post_source = post_source
       @it.new_post(x: 42, y: 'z')
-      post_source.verify
+      expect(post_source).to have_received(:call).with({ x: 42, y: 'z' })
     end
   end
 
   describe '#add_entry' do
     it 'adds the entry to the blog' do
-      entry = mock
-      entry.stubs(:pubdate)
+      entry = double
+      allow(entry).to receive(:pubdate)
       @it.add_entry(entry)
-      @it.entries.must_include(entry)
+      expect(@it.entries).to include(entry)
     end
   end
 

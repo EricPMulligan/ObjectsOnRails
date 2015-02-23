@@ -1,8 +1,7 @@
 require_relative '../spec_helper_lite'
 require_relative '../../app/helpers/exhibits_helper'
-
-class PicturePostExhibit; def initialize(*args); end; end
-class TextPostExhibit; def initialize(*args); end; end
+require_relative '../../app/exhibits/text_post_exhibit'
+require_relative '../../app/exhibits/picture_post_exhibit'
 
 describe ExhibitsHelper do
   before do

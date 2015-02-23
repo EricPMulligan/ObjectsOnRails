@@ -9,18 +9,18 @@ describe PicturePostExhibit do
       body: 'BODY',
       pubdate: 'PUBDATE'
     )
-    @context = mock
+    @context = double
     @it = PicturePostExhibit.new(@post, @context)
   end
 
   it 'delegates method calls to the post' do
-    @it.title.must_equal 'TITLE'
-    @it.body.must_equal 'BODY'
-    @it.pubdate.must_equal 'PUBDATE'
+    expect(@it.title).to eq('TITLE')
+    expect(@it.body).to eq('BODY')
+    expect(@it.pubdate).to eq('PUBDATE')
   end
 
   it 'renders itself with the appropriate partial' do
-    @context.stubs(:render).with( partial: '/posts/picture_body', locals: { post: @it }).returns('THE_HTML')
-    @it.render_body.must_equal 'THE_HTML'
+    allow(@context).to receive(:render).with( partial: '/posts/picture_body', locals: { post: @it }).and_return('THE_HTML')
+    expect(@it.render_body).to eq('THE_HTML')
   end
 end
