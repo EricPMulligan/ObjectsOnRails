@@ -48,6 +48,7 @@ describe Blog do
     def stub_entry_with_date(date)
       OpenStruct.new(pubdate: DateTime.parse(date))
     end
+
     it 'is sorted in reverse-chronological order' do
       oldest = stub_entry_with_date('2011-09-09')
       newest = stub_entry_with_date('2011-09-11')
@@ -55,7 +56,7 @@ describe Blog do
       @it.add_entry(oldest)
       @it.add_entry(newest)
       @it.add_entry(middle)
-      @it.entries.must_equal([newest, middle, oldest])
+      expect(@it.entries).to match_array([newest, middle, oldest])
     end
 
     it 'is limited to 10 items' do
@@ -64,8 +65,8 @@ describe Blog do
       end
       oldest = stub_entry_with_date('2011-08-30')
       @it.add_entry(oldest)
-      @it.entries.size.must_equal(10)
-      @it.entries.wont_include(oldest)
+      expect(@it.entries.size).to eq(10)
+      expect(@it.entries).to_not include(oldest)
     end
   end
 end

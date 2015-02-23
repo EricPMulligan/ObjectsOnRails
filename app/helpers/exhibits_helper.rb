@@ -1,6 +1,7 @@
 module ExhibitsHelper
   def exhibit(model, context)
     # Doing a string comparison because of Rails class-reloading weirdness
+    name = model.class.name
     case model.class.name
       when 'Post'
         if model.picture?
