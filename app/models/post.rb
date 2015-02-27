@@ -18,4 +18,37 @@ class Post < ActiveRecord::Base
   def self.most_recent(limit=10)
     order('pubdate DESC').limit(limit)
   end
+
+  def self.first_before(date)
+    first(conditions: ['pubdate < ?', date], order: 'pubdate DESC')
+  end
+
+  def self.first_after(date)
+    first(conditions: ['pubdate > ?', date], order: 'pubdate ASC')
+  end
+
+  def save(*)
+    set_default_body
+    super
+  end
+
+  def prev
+    self.class.first_before(pubdate)
+  end
+
+  def next
+    self.class.first_after(pubdate)
+  end
+
+  def up
+    blog
+  end
+
+  private
+
+  def set_default_body
+    if body.blank?
+      self.body = 'Nothing to see here'
+    end
+  end
 end
