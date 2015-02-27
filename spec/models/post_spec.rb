@@ -5,36 +5,22 @@ require 'active_model'
 require_relative '../../app/models/post'
 
 describe Post do
+  include SpecHelpers
+
   before do
-    @it = Post.new
+    setup_nulldb
+    @it = Post.new(title: 'TITLE')
+    @ar = @it
   end
 
-  it 'starts with blank attributes' do
-    expect(@it.title).to be_nil
-    expect(@it.title).to be_nil
-    expect(@it.body).to be_nil
-  end
-
-  it 'supports reading and writing a title' do
-    @it.title = 'foo'
-    expect(@it.title).to eq('foo')
-  end
-
-  it 'supports reading and writing a post body' do
-    @it.body = 'foo'
-    expect(@it.body).to eq('foo')
+  after do
+    teardown_nulldb
   end
 
   it 'supports reading and writing a blog reference' do
     blog = Object.new
     @it.blog = blog
     expect(@it.blog).to eq(blog)
-  end
-
-  it 'supports setting attributes in the initializer' do
-    it = Post.new(title: 'mytitle', body: 'mybody')
-    expect(it.title).to eq('mytitle')
-    expect(it.body).to eq('mybody')
   end
 
   it 'is not valid with a blank title' do
@@ -57,15 +43,17 @@ describe Post do
     end
 
     it 'adds the post to the blog' do
-      expect(@blog).to receive(:add_entry) { [@it] }
+      expect(@blog).to receive(:add_entry).and_return([@it])
       @it.publish
     end
 
     describe 'given an invalid post' do
-      before do @it.title = nil end
+      before do
+        allow(@ar).to receive(:valid?).and_return(false)
+      end
 
       it 'wont add the post to the blog' do
-        expect(@blog).to receive(:add_entry).exactly(0).times
+        expect(@blog).to_not receive(:add_entry)
         @it.publish
       end
 
@@ -94,12 +82,24 @@ describe Post do
       end
 
       it 'is a datetime' do
-        expect(@it.pubdate.class).to eq(DateTime)
+        expect(@it.pubdate.class).to eq(ActiveSupport::TimeWithZone)
       end
 
       it 'is the current time' do
         expect(@it.pubdate).to eq(@now)
       end
+    end
+  end
+
+  describe '#picutre?' do
+    it 'is true when the post has a picture URL' do
+      @it.image_url = 'http://example.org/foo.png'
+      expect(@it.picture?).to be_truthy
+    end
+
+    it 'is false when the post has no picture URL' do
+      @it.image_url = ''
+      expect(@it.picture?).to be_falsey
     end
   end
 end

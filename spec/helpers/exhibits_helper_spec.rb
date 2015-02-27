@@ -4,6 +4,7 @@ require_relative '../../app/models/post'
 require_relative '../../app/helpers/exhibits_helper'
 require_relative '../../app/exhibits/text_post_exhibit'
 require_relative '../../app/exhibits/picture_post_exhibit'
+require_relative '../../app/exhibits/link_exhibit'
 
 describe ExhibitsHelper do
   before do
